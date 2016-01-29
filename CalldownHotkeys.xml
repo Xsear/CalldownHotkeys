@@ -76,7 +76,7 @@ xsi:schemaLocation="http://www.red5studios.com/ ../../../../schemas/component.xs
 	<BluePrints>
 		<BluePrint name="PopText" instantiable="true">
 			<Text name="PopupText" dimensions="height:22; width:100%; top:0%; right:100%" style="font:Demi_10; halign:center; eatsmice:false"/>
-			<WebImage name="PopupImage" dimensions="height:48; width:48; top:25%; right:57.5%" style="fixed-bounds:true; eatsmice:false"/>
+			<Icon name="PopupImage" dimensions="height:48; width:48; top:25%; right:57.5%" style="fixed-bounds:true; eatsmice:false"/>
 		</BluePrint>
 		<BluePrint name="KeyCatcher" instantiable="true">
 			<KeyCatcher name="KeyCatch" dimensions="relative:screen; height:0; width:0;" style="eatsmice:false">
@@ -100,7 +100,7 @@ xsi:schemaLocation="http://www.red5studios.com/ ../../../../schemas/component.xs
 						<StillArt name="X" dimensions="center-x:50%; center-y:50%; width:100%-10; height:100%-10" style="texture:Window; region:X; tint:#B82F06"/>
 					</FocusBox>
 
-					<Text id="title" key="{Calldown List}" dimensions="top:0; left:0; width:100%; height:38" style="font:Demi_15; halign:center; valign:center; shadow:0; color:PanelTitle; eatsmice:false" />
+					<Text id="title" key="{Calldown List}" dimensions="top:0; left:0; width:100%; height:38" style="font:Demi_15; halign:center; valign:center; drop-shadow:0; color:PanelTitle; eatsmice:false" />
 
 					<Group id="List" dimensions="center-x:52%; center-y:55.5%; width:100%; height:87.5%"/>
 				</Group>

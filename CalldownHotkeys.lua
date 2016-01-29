@@ -10,14 +10,12 @@ require "string"
 require "lib/lib_table"
 require "lib/lib_Slash"
 require "lib/lib_InterfaceOptions"
-require "lib/lib_DropDownList"
 require "lib/lib_RoundedPopupWindow"
 require "lib/lib_UserKeybinds"
 require "lib/lib_InputIcon"
 require "lib/lib_Debug"
 require "lib/lib_NestedList"
 require "lib/lib_HoloPlate"
-require "lib/lib_Button"
 require "lib/lib_Colors"
 require "./lib_RedBand"
 require "./ListNode"
@@ -350,8 +348,8 @@ function DetailMode()
 		PanelQuantity:SetColor("555555")
 		PanelName:SetColor("555555")
 
-		TextQuantity = Component.CreateWidget('<Text id="TextQuantity" key="{Quantity}" dimensions="dock:fill" style="font:Demi_15; halign:center; valign:center; shadow:0; eatsmice:false"/>', FocusQuantity)
-		TextName = Component.CreateWidget('<Text id="TextQuantity" key="{Name}" dimensions="dock:fill" style="font:Demi_15; halign:center; valign:center; shadow:0; eatsmice:false"/>', FocusName)
+		TextQuantity = Component.CreateWidget('<Text id="TextQuantity" key="{Quantity}" dimensions="dock:fill" style="font:Demi_15; halign:center; valign:center; drop-shadow:0; eatsmice:false"/>', FocusQuantity)
+		TextName = Component.CreateWidget('<Text id="TextQuantity" key="{Name}" dimensions="dock:fill" style="font:Demi_15; halign:center; valign:center; drop-shadow:0; eatsmice:false"/>', FocusName)
 	end
 
 	if Player.IsReady() and onmessageLoaded and Player.GetConsumableItems() then
@@ -524,13 +522,13 @@ function HandleGroup(group)
 
 	-- Destroy Button
 
-	ROUNDWINDOW.BUTTONS.DESTROY = Button.Create(ROUNDWINDOW.GROUP)
+	ROUNDWINDOW.BUTTONS.DESTROY = Component.CreateWidget("<Button dimensions=\"dock:fill\"/>", ROUNDWINDOW.GROUP)
 
 	ROUNDWINDOW.BUTTONS.DESTROY:SetDims("center-x:25%; center-y:85%; height:22; width:100")
 
 	ROUNDWINDOW.BUTTONS.DESTROY:SetText("Destroy Group")
 
-	ROUNDWINDOW.BUTTONS.DESTROY:Bind(function() 
+	ROUNDWINDOW.BUTTONS.DESTROY:BindEvent("OnSubmit", function() 
 
 		if newGroup then group = newGroup newGroup = nil end
 
@@ -579,18 +577,18 @@ function HandleGroup(group)
 
 	ROUNDWINDOW.TEXT.BIND = Component.CreateWidget('<Text id="Bind" key="{Bind:}" dimensions="center-x:15%; center-y:30%; height:20; width:60" style="font:Demi_11"/>', ROUNDWINDOW.GROUP)
 
-	ROUNDWINDOW.BUTTONS.BIND = Button.Create(ROUNDWINDOW.GROUP)
+	ROUNDWINDOW.BUTTONS.BIND = Component.CreateWidget("<Button dimensions=\"dock:fill\"/>", ROUNDWINDOW.GROUP)
 
-	ROUNDWINDOW.BUTTONS.BIND:TintPlate("4f4f4f")
-	ROUNDWINDOW.BUTTONS.BIND.PLATE.INNER:SetParam("alpha", 0)
+	ROUNDWINDOW.BUTTONS.BIND:SetParam("tint", "4f4f4f")
+	--ROUNDWINDOW.BUTTONS.BIND.PLATE.INNER:SetParam("alpha", 0) -- XSEAR NOTE: Looks like an aesthetics thing, not bothering with figuring out something similar
 
 	ROUNDWINDOW.BUTTONS.BIND:SetDims("center-x:36.5%; center-y:30%; height:42; width:42")
 
-	ROUNDWINDOW.BUTTONS.BIND:Bind(BindGroupButton, group)
+	ROUNDWINDOW.BUTTONS.BIND:BindEvent("OnSubmit", BindGroupButton, group) -- XSEAR NOTE: Argument, maybe we need to wrap it in an anonymous function
 
 	-- Input Art
 
-	ROUNDWINDOW.INPUT = InputIcon.CreateVisual(ROUNDWINDOW.BUTTONS.BIND.LABEL_GROUP, "Bind" .. group)
+	ROUNDWINDOW.INPUT = InputIcon.CreateVisual(ROUNDWINDOW.BUTTONS.BIND, "Bind" .. group)
 
 	ROUNDWINDOW.INPUT:GetGroup():EatMice(false)
 
@@ -614,34 +612,45 @@ function HandleGroup(group)
 	ROUNDWINDOW.TEXTINPUT:SetText(group)
 	ROUNDWINDOW.TEXTINPUT:SetTag(group)
 
-	-- Group Type Button
+	-- Group Type Dropdown
 
-	ROUNDWINDOW.TYPE = DropDownList.Create(ROUNDWINDOW.GROUP)
+	ROUNDWINDOW.TYPE = Component.CreateWidget("<DropDown dimensions=\"dock:fill\"/>", ROUNDWINDOW.GROUP)
 	ROUNDWINDOW.TYPE:SetDims("center-x:75%; center-y:85%; height:22; width:100")
 
-	ROUNDWINDOW.TYPE:AddItem("Smart", "smartSlot")
-	ROUNDWINDOW.TYPE:AddItem("Cycle", "cycleSlot")
-	ROUNDWINDOW.TYPE:AddItem("Set", "setSlot")
+	x_groupTypes = {
+		[1] = {label="Smart", value="smartSlot"},
+		[2] = {label="Cycle", value="cycleSlot"},
+		[3] = {label="Set", value="setSlot"},
+	}	
 
-	ROUNDWINDOW.TYPE:SetSelectedByValue(GroupInfo[group].groupType)
+	for index, groupType in pairs(x_groupTypes) do
+		ROUNDWINDOW.TYPE:AddItem(groupType.label)
+		if groupType.value == GroupInfo[group].groupType then
+			ROUNDWINDOW.TYPE:SetSelectedByIndex(index)
+		end
+	end
 
-	ROUNDWINDOW.TYPE:BindOnSelect(SwitchTypes)
+	ROUNDWINDOW.TYPE:BindEvent("OnSelect", function() 
+        local groupTypeIndex = select(2, ROUNDWINDOW.TYPE:GetSelected())
+		local groupTypeValue = x_groupTypes[groupTypeIndex].value
+		SwitchTypes(groupTypeValue)
+	end )
 
 	-- Group Index Dropdown
 
 	ROUNDWINDOW.TEXT.INDEX = Component.CreateWidget('<Text id="Name" key="{Index:}" dimensions="center-x:15%; center-y:65%; height:20; width:60" style="font:Demi_11"/>', ROUNDWINDOW.GROUP)
 
-	ROUNDWINDOW.INDEX = DropDownList.Create(ROUNDWINDOW.GROUP)
+	ROUNDWINDOW.INDEX = Component.CreateWidget("<DropDown dimensions=\"dock:fill\"/>", ROUNDWINDOW.GROUP)
 	ROUNDWINDOW.INDEX:SetDims("center-x:48.5%; center-y:65%; height:22; width:100")
 
-	ROUNDWINDOW.INDEX:AddItem("1", "1")
-	ROUNDWINDOW.INDEX:AddItem("2", "2")
-	ROUNDWINDOW.INDEX:AddItem("3", "3")
-	ROUNDWINDOW.INDEX:AddItem("4", "4")
+	ROUNDWINDOW.INDEX:AddItem("1")
+	ROUNDWINDOW.INDEX:AddItem("2")
+	ROUNDWINDOW.INDEX:AddItem("3")
+	ROUNDWINDOW.INDEX:AddItem("4")
 
-	ROUNDWINDOW.INDEX:SetSelectedByValue(GroupInfo[group].groupIndex)
+	ROUNDWINDOW.INDEX:SetSelectedByIndex(tonumber(GroupInfo[group].groupIndex)) -- Xsear Note: Risky!
 
-	ROUNDWINDOW.INDEX:BindOnSelect(SwitchIndex)
+	ROUNDWINDOW.INDEX:BindEvent("OnSelect", function() SwitchIndex(tostring(ROUNDWINDOW.INDEX:GetSelected())) end)
 end
 
 function SwitchIndex(index)
@@ -651,6 +660,7 @@ function SwitchIndex(index)
 end
 
 function SwitchTypes(type)
+	Debug.Log("SwitchTypes to type ", type)
 	GroupInfo[ACTIVE_GROUP].groupType = type
 
 	Component.SaveSetting("GroupInfo", GroupInfo)
@@ -889,17 +899,18 @@ function UpdateList()
 	groupId = 0
 
 	if not GroupList then
-		GroupButton = Button.Create(Component.GetWidget("Group"))
+		GroupButton = Component.CreateWidget("<Button dimensions=\"dock:fill\"/>", Component.GetWidget("Group"))
 		GroupButton:SetDims("height:22; width:48%; center-x:25%; center-y:-3%")
 
 		GroupButton:SetText("Make a group")
 
-		GroupButton:Bind(MakeGroup)
+		GroupButton:BindEvent("OnSubmit", function() MakeGroup() end) -- Xsear Note: Wrapped because we get an args table that the function doesn't expect
 
-		GroupList = DropDownList.Create(Component.GetWidget("Group"))
+		GroupList = Component.CreateWidget("<DropDown dimensions=\"dock:fill\"/>", Component.GetWidget("Group"))
 		GroupList:SetDims("height:22; width:48%; center-x:75%; center-y:-3%")
 
-		GroupList:BindOnSelect(HandleGroup)
+
+		GroupList:BindEvent("OnSelect", function() DebugTable("HandleGroup GroupListGetSelected", GroupList:GetSelected()) HandleGroup(GroupList:GetSelected()) end) -- Xsear Note: Wrapped because it needs a parameter
 	end
 
 	GroupList:ClearItems()
@@ -907,7 +918,7 @@ function UpdateList()
 	for idx in pairs(LISTS) do
 		groupId = groupId + 1
 
-		GroupList:AddItem(idx, idx)
+		GroupList:AddItem(idx)
 	end
 end
 
@@ -926,6 +937,7 @@ function MakeGroup(indexId, doNotGroupInfo)
 	ENTRY.PLATE:SetColor("#85555555")
 
 	-- Label
+	Debug.Table("GrouPId", groupId)
 	ENTRY.TEXT = Component.CreateWidget('<Text key="{' .. groupId .. '}" dimensions="center-x:51%; center-y:50%; width:100%; height:100%" style="font:UbuntuMedium_11; halign:left; valign:center; eatsmice:false"/>', ENTRY.GROUP)
 	ENTRY.TEXT:SetTag(groupId)
 
@@ -936,19 +948,19 @@ function MakeGroup(indexId, doNotGroupInfo)
 	-- Make an entry
 
 	if not GroupList then
-		GroupButton = Button.Create(Component.GetWidget("Group"))
+		GroupButton = Component.CreateWidget("<Button dimensions=\"dock:fill\"/>", Component.GetWidget("Group"))
 		GroupButton:SetDims("height:22; width:48%; center-x:25%; center-y:-3%")
 
 		GroupButton:SetText("Make a group")
-		GroupButton:Bind(MakeGroup)
+		GroupButton:BindEvent("OnSubmit", function() MakeGroup() end) -- Xsear Note: Wrapped because we get an args table that the function doesn't expect
 
-		GroupList = DropDownList.Create(Component.GetWidget("Group"))
+		GroupList = Component.CreateWidget("<DropDown dimensions=\"dock:fill\"/>", Component.GetWidget("Group"))
 		GroupList:SetDims("height:22; width:48%; center-x:75%; center-y:-3%")
 
-		GroupList:BindOnSelect(HandleGroup)
+		GroupList:BindEvent("OnSelect", function() HandleGroup(GroupList:GetSelected()) end) -- Xsear Note: Wrapped because it needs a parameter
 	end
 
-	GroupList:AddItem(groupId, groupId)
+	GroupList:AddItem(groupId)
 
 	-- Init Group Info
 
@@ -1163,10 +1175,10 @@ end
 function CreateIcon(calldownId, abilityId)
 	timeCall = nil
 
-	cursorIcon = Component.CreateWidget('<WebImage dimensions="relativecursor; height:32; width:32" style="fixed-bounds:true; eatsmice:false"/>', CALLDOWNLIST)
+	cursorIcon = Component.CreateWidget('<Icon dimensions="relativecursor; height:32; width:32" style="fixed-bounds:true; eatsmice:false"/>', CALLDOWNLIST)
 
 	cursorIcon:SetTag(tostring(calldownId) .. "-" .. abilityId)
-	cursorIcon:SetUrl(Game.GetItemInfoByType(calldownId).web_icon)
+	cursorIcon:SetIcon(Game.GetItemInfoByType(calldownId).web_icon_id)
 end
 
 function CanFind(id)
@@ -1278,7 +1290,7 @@ function OnEntryDown(calldownId)
 		POP.TEXT = POPWIDGETS:GetChild("PopupText")
 		POP.IMAGE = POPWIDGETS:GetChild("PopupImage")
 		POP.IMAGE:SetDims("center-x:50%; center-y:52.5%")
-		POP.IMAGE:SetUrl(Game.GetItemInfoByType(calldownId).web_icon)
+		POP.IMAGE:SetIcon(Game.GetItemInfoByType(calldownId).web_icon_id)
 		local binding = FindBind(calldownId)
 		if binding then
 			POP.TEXT:SetText("This calldown is bound to:")
