@@ -2,6 +2,7 @@
 --	CalldownHotkeys (The Takeover) v1.0
 --	 by: RadthorDax ; TAKEN OVER BY HANACHI! MUAHAHAHAHA!
 --  Maintenance: v2.A4 by Amayani
+--  Updated for Firefall v1.6.1934, on 2016-01-29, by Xsear.
 -- ===============================
 
 require "table"
