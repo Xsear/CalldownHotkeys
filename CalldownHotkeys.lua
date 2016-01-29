@@ -661,7 +661,6 @@ function SwitchIndex(index)
 end
 
 function SwitchTypes(type)
-	Debug.Log("SwitchTypes to type ", type)
 	GroupInfo[ACTIVE_GROUP].groupType = type
 
 	Component.SaveSetting("GroupInfo", GroupInfo)
@@ -905,13 +904,13 @@ function UpdateList()
 
 		GroupButton:SetText("Make a group")
 
-		GroupButton:BindEvent("OnSubmit", function() MakeGroup() end) -- Xsear Note: Wrapped because we get an args table that the function doesn't expect
+		GroupButton:BindEvent("OnSubmit", function() MakeGroup() end) -- Wrapped because we get an args table that the function doesn't expect
 
 		GroupList = Component.CreateWidget("<DropDown dimensions=\"dock:fill\"/>", Component.GetWidget("Group"))
 		GroupList:SetDims("height:22; width:48%; center-x:75%; center-y:-3%")
 
 
-		GroupList:BindEvent("OnSelect", function() DebugTable("HandleGroup GroupListGetSelected", GroupList:GetSelected()) HandleGroup(GroupList:GetSelected()) end) -- Xsear Note: Wrapped because it needs a parameter
+		GroupList:BindEvent("OnSelect", function() HandleGroup(GroupList:GetSelected()) end)
 	end
 
 	GroupList:ClearItems()
@@ -938,7 +937,6 @@ function MakeGroup(indexId, doNotGroupInfo)
 	ENTRY.PLATE:SetColor("#85555555")
 
 	-- Label
-	Debug.Table("GrouPId", groupId)
 	ENTRY.TEXT = Component.CreateWidget('<Text key="{' .. groupId .. '}" dimensions="center-x:51%; center-y:50%; width:100%; height:100%" style="font:UbuntuMedium_11; halign:left; valign:center; eatsmice:false"/>', ENTRY.GROUP)
 	ENTRY.TEXT:SetTag(groupId)
 
