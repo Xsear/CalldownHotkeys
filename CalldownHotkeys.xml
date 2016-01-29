@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns="http://www.red5studios.com/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.red5studios.com/ ../../../../schemas/component.xsd">
+	<Info
+		title="CalldownHotkeys"
+		author="RadthorDax;Hanachi"
+		description="Lua-bindable hotkeys for calldowns"
+		url=""
+		uiVersion="1000"
+	/>
+	
+	<Events>
+    <Event name="ON_COMPONENT_LOAD"       bind="OnComponentLoad" />
+    <Event name="ON_PLAYER_READY"         bind="OnPlayerReady" />
+    <Event name="ON_LOAD_CALLDOWN"        bind="OnLoadCalldown" />
+    <Event name="MY_USER_CALLDOWNHOTKEYS" bind="OnHotkeys"/>
+    <Event name="ON_REQUEST_BINDINGS"     bind="DumpKeys"/>
+    <Event name="ON_STREAM_PROGRESS"      bind="OnLoading" />
+    <Event name="ON_PRE_RELOADUI"		  bind="OnReloadUI"/>
+	</Events>
+
+	<Textures>
+		<Texture name="AchievementArt" src="components/MainUI/Panels/MissionLedger/achivement_art.dds" premultiplied="false">
+			<Region name="achievement_bg" top="0" bottom="126" left="0" right="685" />
+			<Region name="backplate" top="66" bottom="104" left="928" right="988" />
+		</Texture>
+		<Texture name="Popup" src="components/MainUI/Panels/EscMenu/panel_framing.png" premultiplied="false"/>
+		<Texture name="AchievementPlates" src="components/MainUI/Panels/MissionLedger/achievement_progress_plates.png" premultiplied="false">
+			<Region name="Daily_Backplate" top="0" bottom="36" left="0" right="549" />
+			<Region name="Daily_Frontplate" top="36" bottom="72" left="0" right="549" />
+			<Region name="Small_Backplate" top="72" bottom="102" left="0" right="514" />
+			<Region name="Small_Frontplate" top="102" bottom="132" left="0" right="514" />
+		</Texture>
+		<Texture name="IconBorder" src="components/MainUI/Panels/RewardScreen/icon_border.png" premultiplied="false" />
+		<Texture name="IconBackDrop" src="components/MainUI/Panels/RewardScreen/icon_backdrop.png" premultiplied="false" />
+		<Texture name="chevrons" src="skins/textures/con_icons.dds" premultiplied="true">
+			<Region name="down" top="1" bottom="127" left="257" right="383" />
+			<Region name="up" top="129" bottom="255" left="257" right="383" />
+		</Texture>
+	</Textures>
+
+	<Colors>
+		<Color name="AtlasBlue" value="#4BABFF"/>
+		<Color name="AtlasBlueGlow" value="#404BABFF"/>
+	</Colors> 
+
+	<Styles>
+		<StyleSheet name="GreyBackDrop" parent="PanelSubBackDrop">  
+			alpha:.85;
+			tint:#555555;
+			eatsmice:false;
+		</StyleSheet>
+		<StyleSheet name="SolidBackDrop" parent="PanelSubBackDrop">  
+			alpha:1;
+			tint:000000;
+			eatsmice:false;
+		</StyleSheet>  
+		<StyleSheet name="EntryBackDrop" parent="PanelSubBackDrop">  
+			alpha:.5;
+			tint:#555555;
+			eatsmice:false;
+		</StyleSheet> 
+		<StyleSheet name="CalldownBackDrop" parent="PanelSubBackDrop">  
+			alpha:.75;
+			tint:#555555;
+			eatsmice:false;
+		</StyleSheet> 
+		<StyleSheet name="CatBackDrop" parent="PanelSubBackDrop">  
+			alpha:.85;
+			tint:000000;
+			eatsmice:false;
+		</StyleSheet> 
+	</Styles>
+
+	<BluePrints>
+		<BluePrint name="PopText" instantiable="true">
+			<Text name="PopupText" dimensions="height:22; width:100%; top:0%; right:100%" style="font:Demi_10; halign:center; eatsmice:false"/>
+			<WebImage name="PopupImage" dimensions="height:48; width:48; top:25%; right:57.5%" style="fixed-bounds:true; eatsmice:false"/>
+		</BluePrint>
+		<BluePrint name="KeyCatcher" instantiable="true">
+			<KeyCatcher name="KeyCatch" dimensions="relative:screen; height:0; width:0;" style="eatsmice:false">
+				<Events>
+					<OnKeyCatch bind="OnKeyPress"/>
+				</Events>
+			</KeyCatcher>
+		</BluePrint>
+	</BluePrints>
+
+	<Frames>
+		<PanelFrame name="CalldownList" dimensions="dock:fill" visible="false" depth="-5">
+			<Children>	
+				<Group id="Calldowns" dimensions="center-x:30%; center-y:45%; width:52.5%; height:65%" style="alpha:1">
+					
+					<Border name="paneltitle" dimensions="top:0; bottom:36; left:0; right:100%+22" class="PanelBackDrop" />
+					<Border name="panelbody" dimensions="top:38; bottom:100%; left:0; right:100%+22" class="PanelBackDrop" />
+
+					<FocusBox id="close" dimensions="right:102.5%; top:6; width:26; height:26;">
+						<Border class="SmallBorders" dimensions="dock:fill" style="alpha:0.5; padding:5"/>
+						<StillArt name="X" dimensions="center-x:50%; center-y:50%; width:100%-10; height:100%-10" style="texture:Window; region:X; tint:#B82F06"/>
+					</FocusBox>
+
+					<Text id="title" key="{Calldown List}" dimensions="top:0; left:0; width:100%; height:38" style="font:Demi_15; halign:center; valign:center; shadow:0; color:PanelTitle; eatsmice:false" />
+
+					<Group id="List" dimensions="center-x:52%; center-y:55.5%; width:100%; height:87.5%"/>
+				</Group>
+				<Group id="Groups" dimensions="center-x:77.5%; center-y:45%; width:35%; height:65%" style="alpha:1">
+					<Border name="panelbody" dimensions="top:38; bottom:100%; left:0; right:100%+22" class="PanelBackDrop" />
+					<Group id="Group" dimensions="center-x:52%; center-y:55%; width:100%+10; height:87.5%"/>
+				</Group>
+				<Group id="InvisibleGroup" dimensions="center-x:0%; center-y-0%; height:0; width:0"/>
+			</Children>
+		</PanelFrame>
+	</Frames>
+
+</Component>
